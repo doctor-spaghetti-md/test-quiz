@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Result 3</title>
+  <meta name="description" content="Love language results page." />
+
+  <link rel="stylesheet" href="./results.css" />
+</head>
+
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="cloudLayer cloudA"></div>
+    <div class="cloudLayer cloudB"></div>
+    <div class="cloudLayer cloudC"></div>
+    <div class="cloudImgLayer"></div>
+  </div>
+
+  <main class="wrap">
+    <header class="topRow">
+      <div class="navBtns">
+        <a class="btnLink neonBlue" href="../index.html">← Back to quiz</a>
+        <a class="btnLink neonPink" href="../../index.html">Main newsletter</a>
+      </div>
+      <div class="monoLine" id="timeStamp"></div>
+    </header>
+
+    <section class="card" id="resultsApp" data-result="3">
+      <h1 class="h1" id="resultTitle">Result 3</h1>
+
+      <img class="resultHero" src="../img/img3.jpg" alt="Result image" loading="lazy" />
+
+      <p class="blurb">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+
+      <div class="diagBar">
+        <div class="diagText" id="diagLine">DIAG CODE: LL-3 / CONFIDENCE: ???% / TOTAL: ???%</div>
+      </div>
+
+      <h2 class="h2">Explore other results</h2>
+      <div class="otherResults" id="otherResults" aria-label="Other results"></div>
+
+      <div id="chartsWrap" class="chartsWrap">
+        <h2 class="h2">Clinical Charts</h2>
+
+        <div class="chartsGrid">
+          <div class="chartBox">
+            <div class="chartTitle">Plane Radar Diagnostics</div>
+            <div class="canvasWrap"><canvas id="radarCanvas"></canvas></div>
+          </div>
+
+          <div class="chartBox">
+            <div class="chartTitle">Affect Distribution (Unverified)</div>
+            <div class="canvasWrap"><canvas id="pieCanvas"></canvas></div>
+          </div>
+
+          <div class="chartBox">
+            <div class="chartTitle">Cardiac Trace (Dramatized)</div>
+            <div class="canvasWrap"><canvas id="ekgMiniCanvas"></canvas></div>
+          </div>
+
+          <div class="chartBox">
+            <div class="chartTitle">Telemetry</div>
+            <div class="canvasWrap"><canvas id="sparkCanvas"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="notYouWarn" class="notYouWarn" hidden>
+        THIS IS NOT YOU
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/results.js"></script>
+</body>
+</html>

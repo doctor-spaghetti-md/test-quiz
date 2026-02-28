@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Result 1</title>
+  <link rel="stylesheet" href="./results.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="cloudLayer cloudA"></div>
+    <div class="cloudLayer cloudB"></div>
+  </div>
+
+  <main class="wrap" id="resultsApp" data-result="1">
+<div class="topRow">
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+    <a class="backLink" href="../index.html">← Back to quiz</a>
+    <a class="backLink" href="../../index.html">Main newsletter</a>
+  </div>
+  <div class="monoLine" id="timeStamp"></div>
+</div>
+
+    <section class="card">
+      <h1 class="h1" id="resultTitle">Result 1</h1>
+      <img class="resultHero" src="../img/img1.jpg" alt="Result image" loading="lazy" />
+      <p class="monoLine" id="diagLine">DIAG</p>
+
+      <p class="blurb">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+
+      <div class="grid">
+        <div class="chartBox">
+          <div class="chartTitle">Plane radar diagnostics</div>
+          <div class="canvasWrap"><canvas id="radarCanvas"></canvas></div>
+        </div>
+
+        <div class="chartBox">
+          <div class="chartTitle">Affect distribution (unverified)</div>
+          <div class="canvasWrap"><canvas id="pieCanvas"></canvas></div>
+        </div>
+
+        <div class="chartBox">
+          <div class="chartTitle">Cardiac trace (dramatized)</div>
+          <div class="canvasWrap"><canvas id="ekgMiniCanvas"></canvas></div>
+        </div>
+
+        <div class="chartBox">
+          <div class="chartTitle">Telemetry scribbles</div>
+          <div class="canvasWrap"><canvas id="sparkCanvas"></canvas></div>
+        </div>
+      </div>
+
+      <div class="otherRow" id="otherResults" aria-label="Other results"></div>
+    </section>
+  </main>
+
+  <script src="../js/results.js"></script>
+</body>
+</html>

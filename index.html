@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>What is your love language?</title>
+  <meta name="description" content="A chaotic personality quiz with random results and nonsense charts." />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="cloudLayer cloudA"></div>
+    <div class="cloudLayer cloudB"></div>
+    <div class="cloudLayer cloudC"></div>
+    <div class="cloudImgLayer"></div>
+  </div>
+
+  <main class="wrap" id="quizApp">
+    <header class="header">
+      <div class="titleFrame">
+        <!-- <img class="titleFrameImg" src="./img/title-cloud-frame.png" alt="" aria-hidden="true" /> -->
+
+        <h1 id="pageTitle" class="title animate__animated animate__fadeInDown">
+          <span class="rainbowWord">What is your</span><br/>
+          <span class="rainbowWord">love language?</span>
+        </h1>
+      </div>
+
+      <div class="subRow">
+        <a class="btnLink neonBlue" id="newsletterBtn" href="../index.html">Main newsletter</a>
+
+        <div class="pill glowPill" id="qPill">Q: 1 / 1</div>
+        <div class="pill glowPill2" id="qLabel">QUESTION 1</div>
+
+        <button class="btn neonPink" id="backBtn" type="button" aria-disabled="true" disabled>
+          Back
+        </button>
+      </div>
+    </header>
+
+    <section class="vitalsRow" aria-label="Vitals">
+      <div class="vitalCard">
+        <div class="ekgHeader">
+          <div class="ekgPill ekgPill2" id="bpmPill">BPM: 72</div>
+          <div class="ekgPill">CARDIAC TELEMETRY</div>
+        </div>
+
+        <div class="ekgScreen" role="img" aria-label="Animated EKG line">
+          <svg class="ekgSvg" viewBox="0 0 800 150" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="ekgGrad" x1="0" x2="1">
+                <stop offset="0" stop-color="rgba(255,0,184,0.95)"/>
+                <stop offset="0.5" stop-color="rgba(40,215,255,0.92)"/>
+                <stop offset="1" stop-color="rgba(255,138,0,0.92)"/>
+              </linearGradient>
+
+              <filter id="ekgGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="3.2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <path class="ekgBase" d="M0 75 H800"></path>
+            <path class="ekgLine" id="ekgLine" d=""></path>
+          </svg>
+          <div class="ekgScan"></div>
+        </div>
+      </div>
+
+      <div class="vitalCard">
+        <div class="ekgHeader">
+          <div class="ekgPill ekgPill2">LOVE WAVE</div>
+          <div class="ekgPill">STABILITY: ???</div>
+        </div>
+
+        <div class="loveWave" id="loveBars" aria-hidden="true">
+          <div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div>
+          <div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div>
+          <div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div>
+          <div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div><div class="loveBar"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="quizPanel">
+      <h2 class="questionTitle" id="qTitle">Question 1</h2>
+      <div class="answersGrid" id="answersGrid" aria-label="Answer choices"></div>
+      <div class="hint" id="hintLine">Click any card to answer. It will auto-advance.</div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
