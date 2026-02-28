@@ -32,61 +32,14 @@ body{
   overflow-x:hidden;
 
   background:
-    radial-gradient(1400px 900px at 50% 110%, rgba(255,0,184,.55), transparent 68%),
-    radial-gradient(1000px 720px at 70% 90%, rgba(255,138,0,.28), transparent 66%),
-    radial-gradient(900px 650px at 24% 78%, rgba(255,60,140,.22), transparent 66%),
-    radial-gradient(900px 600px at 80% 26%, rgba(40,215,255,.14), transparent 64%),
-    linear-gradient(180deg,
-      #9df1ff 0%,
-      #ffd1e6 32%,
-      #ff9ad0 50%,
-      #ff4fcf 66%,
-      #ff8a00 84%,
-      #2a0033 100%);
+    radial-gradient(1100px 700px at 15% 10%, rgba(255,0,184,.75), transparent 55%),
+    radial-gradient(900px 650px at 90% 15%, rgba(40,215,255,.55), transparent 58%),
+    radial-gradient(900px 680px at 65% 85%, rgba(182,255,46,.50), transparent 60%),
+    radial-gradient(800px 600px at 18% 90%, rgba(255,232,74,.55), transparent 60%),
+    radial-gradient(900px 620px at 92% 78%, rgba(139,91,255,.50), transparent 62%),
+    linear-gradient(180deg, rgba(255,43,214,.85), rgba(255,0,184,.90));
 
   filter: saturate(1.35) contrast(1.06);
-}
-
-.sky{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-
-.cloudLayer{
-  position:absolute;
-  inset:-20%;
-  opacity:.48;
-  mix-blend-mode: screen;
-}
-
-.cloudLayer.cloudA{
-  background:
-    radial-gradient(120px 70px at 16% 22%, rgba(255,255,255,.55), transparent 72%),
-    radial-gradient(210px 110px at 28% 20%, rgba(255,255,255,.42), transparent 76%),
-    radial-gradient(170px 95px at 40% 24%, rgba(255,255,255,.38), transparent 76%),
-    radial-gradient(200px 110px at 70% 18%, rgba(255,255,255,.42), transparent 76%),
-    radial-gradient(160px 90px at 84% 20%, rgba(255,255,255,.34), transparent 78%);
-  animation: cloudDriftA 65s linear infinite;
-}
-.cloudLayer.cloudB{
-  opacity:.32;
-  background:
-    radial-gradient(220px 120px at 20% 60%, rgba(255,255,255,.36), transparent 78%),
-    radial-gradient(320px 160px at 38% 62%, rgba(255,255,255,.28), transparent 80%),
-    radial-gradient(280px 150px at 66% 64%, rgba(255,255,255,.26), transparent 82%),
-    radial-gradient(300px 160px at 84% 66%, rgba(255,255,255,.22), transparent 82%);
-  animation: cloudDriftB 95s linear infinite;
-}
-
-@keyframes cloudDriftA{
-  from{ transform: translate3d(-3%, -1%, 0); }
-  to  { transform: translate3d( 7%,  2%, 0); }
-}
-@keyframes cloudDriftB{
-  from{ transform: translate3d( 4%,  1%, 0); }
-  to  { transform: translate3d(-6%, -2%, 0); }
 }
 
 /* Layout */
@@ -223,32 +176,7 @@ body{
   background: linear-gradient(90deg, rgba(255,0,184,.95), rgba(255,138,0,.85), rgba(255,0,184,.95));
 }
 
-/* Real PNG/JPG cloud layer using /img assets */
-.cloudImgLayer{
-  position:absolute;
-  inset:-12%;
-  pointer-events:none;
 
-  opacity:.62;
-  mix-blend-mode: screen;
-
-  background-image:
-    url("./img/cloud1.png"),
-    url("./img/cloud2.jpg"),
-    url("./img/cloud3.png");
-
-  background-repeat: repeat;
-  background-size: 620px auto, 900px auto, 760px auto;
-  background-position: 0% 12%, 35% 22%, 15% 62%;
-
-  filter: saturate(1.05) brightness(1.08) contrast(1.04);
-  animation: cloudImgDrift 80s linear infinite;
-}
-
-@keyframes cloudImgDrift{
-  from{ transform: translate3d(-2%, -1%, 0); }
-  to  { transform: translate3d( 6%,  2%, 0); }
-}
 
 .resultHero{
   width:100%;
