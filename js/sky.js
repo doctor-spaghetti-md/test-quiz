@@ -10,7 +10,7 @@
     const EMOJIS = opts.emojis || ["🛩️","✈️","🛫","🛬","🚁","🛸"];
     const planeCount = opts.planeCount ?? 10;
 
-    const TRAIL_MAX = opts.trailMax ?? 320;
+    const TRAIL_MAX = opts.trailMax ?? 260;      // longer = more path history
     const SPEED_MIN = opts.speedMin ?? 0.8;
     const SPEED_MAX = opts.speedMax ?? 1.8;
 
@@ -31,7 +31,7 @@
     function rand(min, max){ return Math.random() * (max - min) + min; }
     function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 
-    // Catmull-Rom interpolation
+    // Catmull-Rom interpolation for smooth curvy paths
     function catmullRom(p0, p1, p2, p3, t){
       const t2 = t * t;
       const t3 = t2 * t;
@@ -52,12 +52,11 @@
     }
 
     function randomPoint(){
-      // allow off-screen so paths enter/exit
-      return { x: rand(-120, W + 120), y: rand(-120, H + 120) };
+      return { x: rand(-80, W + 80), y: rand(-80, H + 80) };
     }
 
     function hueAt(i, n, shift){
-      const base = (i / Math.max(1, n-1)) * 330;
+      const base = (i / Math.max(1, n-1)) * 320;
       return (base + shift) % 360;
     }
 
@@ -71,34 +70,40 @@
         emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
         size: rand(22, 44),
         speed: rand(SPEED_MIN, SPEED_MAX),
+        // four control points for Catmull-Rom window
         p0, p1, p2, p3,
         t: rand(0, 1),
         hueShift: rand(0, 360),
         trail: [],
-        alpha: rand(0.70, 0.95)
+        // slight drift in opacity
+        alpha: rand(0.75, 0.95)
       };
     });
 
     function stepPlane(pl){
-      pl.t += 0.0046 * pl.speed;
-
+      pl.t += 0.0045 * pl.speed; // speed factor
       if (pl.t >= 1){
         pl.t = 0;
 
+        // shift window forward: p0<-p1<-p2<-p3, new p3
         pl.p0 = pl.p1;
         pl.p1 = pl.p2;
         pl.p2 = pl.p3;
         pl.p3 = randomPoint();
 
+        // occasionally switch emoji
         if (Math.random() < 0.25){
           pl.emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
         }
+        // small size changes
         pl.size = clamp(pl.size + rand(-3, 3), 20, 48);
         pl.speed = clamp(pl.speed + rand(-0.25, 0.25), SPEED_MIN, SPEED_MAX);
       }
 
+      // compute position
       const pos = catmullRom(pl.p0, pl.p1, pl.p2, pl.p3, pl.t);
 
+      // push into trail history
       pl.trail.push({ x: pos.x, y: pos.y });
       if (pl.trail.length > TRAIL_MAX) pl.trail.shift();
 
@@ -109,16 +114,29 @@
       const pts = pl.trail;
       if (pts.length < 2) return;
 
+      // thick blurred underglow
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
 
-      // two-pass: soft underglow + crisp neon
       for (let pass = 0; pass < 2; pass++){
+        ctx.beginPath();
+        for (let i = 0; i < pts.length; i++){
+          const p = pts[i];
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+
         const width = pass === 0 ? 10 : 4;
+        ctx.lineWidth = width;
+
+        // rainbow stroke via segmenting (simple + pretty)
+        // draw per-segment so hue can change along the line
+        ctx.strokeStyle = "transparent"; // not used here
+        ctx.stroke(); // establishes path for slight smoothing
 
         for (let i = 1; i < pts.length; i++){
           const a = pts[i-1], b = pts[i];
-          const fade = i / pts.length;
+          const fade = i / pts.length; // older = smaller
           const hue = hueAt(i, pts.length, pl.hueShift);
           const alpha = (pass === 0 ? 0.10 : 0.55) * pl.alpha * fade;
 
@@ -137,10 +155,11 @@
       ctx.shadowBlur = 0;
     }
 
-    function drawPlane(pl, pos){
+    function drawPlaneEmoji(pl, pos){
       ctx.save();
       ctx.globalAlpha = pl.alpha;
 
+      // orientation from last two points
       let angle = 0;
       const pts = pl.trail;
       if (pts.length >= 2){
@@ -156,6 +175,7 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
+      // glow behind emoji
       ctx.shadowBlur = 18;
       ctx.shadowColor = `hsla(${(pl.hueShift+40)%360}, 100%, 60%, 0.55)`;
 
@@ -164,15 +184,17 @@
     }
 
     function tick(){
+      // clear
       ctx.clearRect(0, 0, W, H);
 
+      // draw all trails first, then emojis
       for (const pl of planes){
         stepPlane(pl);
         drawTrail(pl);
       }
       for (const pl of planes){
         const pos = pl.trail[pl.trail.length - 1];
-        if (pos) drawPlane(pl, pos);
+        if (pos) drawPlaneEmoji(pl, pos);
       }
 
       requestAnimationFrame(tick);
@@ -181,11 +203,11 @@
     tick();
   }
 
+  // Expose globally so results pages can call it too
   window.initSkyTrails = initSkyTrails;
 
+  // Auto-init if canvas exists
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("skyCanvas")){
-      initSkyTrails("skyCanvas", { planeCount: 11, trailMax: 360 });
-    }
+    if (document.getElementById("skyCanvas")) initSkyTrails("skyCanvas");
   });
 })();
