@@ -1,244 +1,168 @@
-const $ = (sel, root=document) => root.querySelector(sel);
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-/* EDIT ME */
-const QUIZ = [
+const QUESTIONS = [
   {
-    label: "QUESTION 1",
-    text: "Question 1",
-    answers: [
-      { img:"./img/img1.jpg", blurb:"Answer 1 blurb text." },
-      { img:"./img/img2.jpg", blurb:"Answer 2 blurb text." },
-      { img:"./img/img3.jpg", blurb:"Answer 3 blurb text." },
-      { img:"./img/img4.jpg", blurb:"Answer 4 blurb text." }
-    ]
+    q: "Question 1",
+    choices: [
+      { label: "Answer 1", img: "img/img1.jpg" },
+      { label: "Answer 2", img: "img/img2.jpg" },
+      { label: "Answer 3", img: "img/img3.jpg" },
+      { label: "Answer 4", img: "img/img4.jpg" },
+    ],
   },
   {
-    label: "QUESTION 2",
-    text: "Question 2",
-    answers: [
-      { img:"./img/img1.jpg", blurb:"Answer 2.1 blurb text." },
-      { img:"./img/img2.jpg", blurb:"Answer 2.2 blurb text." },
-      { img:"./img/img3.jpg", blurb:"Answer 2.3 blurb text." },
-      { img:"./img/img4.jpg", blurb:"Answer 2.4 blurb text." }
-    ]
+    q: "Question 2",
+    choices: [
+      { label: "Answer 2.1", img: "img/img1.jpg" },
+      { label: "Answer 2.2", img: "img/img2.jpg" },
+      { label: "Answer 2.3", img: "img/img3.jpg" },
+      { label: "Answer 2.4", img: "img/img4.jpg" },
+    ],
   },
   {
-    label: "QUESTION 3",
-    text: "Question 3",
-    answers: [
-      { img:"./img/img2.jpg", blurb:"Answer 3.1 blurb text." },
-      { img:"./img/img3.jpg", blurb:"Answer 3.2 blurb text." },
-      { img:"./img/img4.jpg", blurb:"Answer 3.3 blurb text." },
-      { img:"./img/img1.jpg", blurb:"Answer 3.4 blurb text." }
-    ]
-  }
+    q: "Question 3",
+    choices: [
+      { label: "Answer 3.1", img: "img/img1.jpg" },
+      { label: "Answer 3.2", img: "img/img2.jpg" },
+      { label: "Answer 3.3", img: "img/img3.jpg" },
+      { label: "Answer 3.4", img: "img/img4.jpg" },
+    ],
+  },
 ];
 
-let qIndex = 0;
-const history = [];
+const RESULT_COUNT = 5;
 
-/* Title animation */
+let idx = 0;
+const answersPicked = [];
+
+const $ = (sel) => document.querySelector(sel);
+const titleEl = $("#title");
+const questionText = $("#questionText");
+const answersEl = $("#answers");
+const backBtn = $("#backBtn");
+const progressText = $("#progressText");
+const meterFill = $("#meterFill");
+
 function animateTitle(){
-  const title = $("#pageTitle");
-  if (!title) return;
+  // Entrance pop
+  gsap.fromTo(
+    titleEl,
+    { y: -12, opacity: 0, rotate: -1.0, filter: "blur(6px)" },
+    { y: 0, opacity: 1, rotate: 0, filter: "blur(0px)", duration: 0.65, ease: "power3.out" }
+  );
 
-  if (window.gsap){
-    window.gsap.to(title, { scale: 1.06, duration: 0.9, yoyo: true, repeat: -1, ease: "sine.inOut" });
-  } else {
-    title.animate([{ transform:"scale(1)" },{ transform:"scale(1.06)" },{ transform:"scale(1)" }],
-      { duration: 1800, iterations: Infinity, easing: "ease-in-out" });
-  }
-
-  if (window.anime){
-    window.anime({
-      targets: ".rainbowWord",
-      filter: [
-        { value: "saturate(1.35) contrast(1.08)", duration: 0 },
-        { value: "saturate(1.60) contrast(1.12)", duration: 1100 },
-        { value: "saturate(1.35) contrast(1.08)", duration: 1100 }
-      ],
-      easing: "easeInOutSine",
-      loop: true
-    });
-  }
+  // Gentle float
+  anime({
+    targets: titleEl,
+    translateY: [0, -1, 0],
+    duration: 1200,
+    easing: "easeInOutSine",
+    loop: true
+  });
 }
 
-function animatePanelIn(){
-  const panel = $("#quizPanel");
-  if (!panel) return;
-  panel.classList.remove("animate__animated","animate__fadeInUp");
-  void panel.offsetWidth;
-  panel.classList.add("animate__animated","animate__fadeInUp");
+function render(){
+  const total = QUESTIONS.length;
+
+  backBtn.style.visibility = idx === 0 ? "hidden" : "visible";
+  progressText.textContent = `Question ${idx + 1} of ${total}`;
+
+  // meter (snaps nicely)
+  meterFill.style.width = `${Math.round(((idx + 1) / total) * 100)}%`;
+
+  questionText.textContent = QUESTIONS[idx].q;
+
+  answersEl.innerHTML = "";
+  QUESTIONS[idx].choices.forEach((ch, cIndex) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answerBtn";
+    btn.setAttribute("role", "listitem");
+
+    // TEXT ONLY (no separate title/meta)
+    btn.innerHTML = `<div class="ansText">${escapeHtml(ch.label)}</div>`;
+
+    btn.addEventListener("click", (ev) => handlePick(ev, btn, cIndex));
+    answersEl.appendChild(btn);
+  });
 }
 
-function renderQuestion(){
-  const q = QUIZ[qIndex];
-  const total = QUIZ.length;
+let locked = false;
 
-  $("#qPill") && ($("#qPill").textContent = `Q: ${qIndex + 1} / ${total}`);
-  $("#qLabel") && ($("#qLabel").textContent = q.label || `QUESTION ${qIndex + 1}`);
-  $("#qTitle") && ($("#qTitle").textContent = q.text || `Question ${qIndex + 1}`);
+function handlePick(ev, btn, cIndex){
+  if (locked) return;
+  locked = true;
 
-  const backBtn = $("#backBtn");
-  if (backBtn){
-    const disabled = (qIndex === 0);
-    backBtn.disabled = disabled;
-    backBtn.setAttribute("aria-disabled", String(disabled));
-  }
+  answersPicked[idx] = cIndex;
 
-  const grid = $("#answersGrid");
-  if (!grid) return;
-  grid.innerHTML = "";
+  const rect = btn.getBoundingClientRect();
+  const rx = ((ev.clientX - rect.left) / rect.width) * 100;
+  const ry = ((ev.clientY - rect.top) / rect.height) * 100;
+  btn.style.setProperty("--rx", `${rx}%`);
+  btn.style.setProperty("--ry", `${ry}%`);
 
-  q.answers.forEach((a, i) => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "answerCard";
-    card.setAttribute("aria-label", `Answer choice ${i+1}`);
+  document.querySelectorAll(".answerBtn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
 
-    const src = a.img || "./img/img1.jpg";
-    const blurb = a.blurb || `Answer ${i+1} blurb text.`;
+  btn.classList.remove("radar");
+  void btn.offsetWidth;
+  btn.classList.add("radar");
 
-    card.innerHTML = `
-      <div class="answerImgWrap">
-        <img class="answerImg" src="${escapeHtml(src)}" alt="Stock photo choice" loading="lazy" />
-      </div>
-      <div class="answerBlurb">${escapeHtml(blurb)}</div>
-    `;
-
-    card.addEventListener("click", () => {
-      history[qIndex] = i;
-      card.classList.add("picked");
-      setTimeout(() => card.classList.remove("picked"), 170);
-      nextQuestion();
-    });
-
-    grid.appendChild(card);
+  anime({
+    targets: btn,
+    scale: [1, 1.02, 1],
+    duration: 320,
+    easing: "easeOutQuad",
   });
 
-  animatePanelIn();
+  setTimeout(() => {
+    next();
+    locked = false;
+  }, 420);
 }
 
-function nextQuestion(){
-  if (qIndex < QUIZ.length - 1){
-    qIndex++;
-    renderQuestion();
-  } else {
-    goToRandomResult();
+function next(){
+  if (idx < QUESTIONS.length - 1){
+    idx++;
+    render();
+    return;
   }
+  finish();
 }
 
-function prevQuestion(){
-  if (qIndex === 0) return;
-  qIndex--;
-  renderQuestion();
+function back(){
+  if (idx === 0) return;
+  idx--;
+  render();
 }
 
-function goToRandomResult(){
-  const picked = 1 + Math.floor(Math.random() * 5);
-  const seed = Math.floor(Math.random() * 999999);
-  const p = encodeURIComponent(history.join(","));
-  window.location.href = `./results/result${picked}.html?picked=${picked}&seed=${seed}&p=${p}`;
-}
+function finish(){
+  const chosen = randInt(1, RESULT_COUNT);
 
-/* EKG */
-function initBpmAndEkg(){
-  const pill = $("#bpmPill");
-  const ekg = $("#ekgLine");
-  const scan = $(".ekgScan");
-  if (!pill || !ekg) return;
-
-  const HEARTBEAT_D =
-`M0 75
- L90 75 L110 75
- L125 55 L135 95 L145 30 L160 75
- L220 75 L250 75
- L265 58 L275 92 L290 38 L305 75
- L390 75 L420 75
- L435 62 L445 90 L460 45 L475 75
- L560 75 L590 75
- L605 60 L615 92 L630 36 L645 75
- L800 75`;
-  const FLATLINE_D = "M0 75 H800";
-
-  let bpm = 72;
-  let beatsUntilFlatline = 8 + Math.floor(Math.random() * 8);
-  let flatTicksLeft = 0;
-
-  function setFlatline(on){
-    ekg.setAttribute("d", on ? FLATLINE_D : HEARTBEAT_D);
-    ekg.style.animationPlayState = on ? "paused" : "running";
-    if (on){
-      ekg.style.strokeDashoffset = "0";
-      if (scan) scan.style.animationPlayState = "paused";
-    } else {
-      ekg.style.strokeDashoffset = "";
-      if (scan) scan.style.animationPlayState = "running";
-    }
+  const percents = [];
+  for (let i = 1; i <= RESULT_COUNT; i++){
+    const p = randInt(3, 167) + (Math.random() < 0.25 ? randInt(40, 120) : 0);
+    percents.push(p);
   }
 
-  setFlatline(false);
+  const payload = {
+    chosen,
+    percents,
+    ts: Date.now(),
+    answersPicked,
+  };
 
-  setInterval(() => {
-    if (flatTicksLeft > 0){
-      flatTicksLeft--;
-      bpm = Math.max(0, bpm - 10);
-      pill.textContent = `BPM: ${bpm}`;
-      if (flatTicksLeft === 0){
-        setFlatline(false);
-        bpm = 66 + Math.floor(Math.random() * 10);
-        pill.textContent = `BPM: ${bpm}`;
-        beatsUntilFlatline = 8 + Math.floor(Math.random() * 10);
-      }
-      return;
-    }
-
-    const spike = Math.random() < 0.10 ? (6 + Math.floor(Math.random() * 10)) : 0;
-    const drift = (Math.random() * 4 - 2);
-    bpm = Math.max(54, Math.min(140, Math.round(bpm + drift + spike)));
-    pill.textContent = `BPM: ${bpm}`;
-
-    beatsUntilFlatline--;
-    if (beatsUntilFlatline <= 0){
-      setFlatline(true);
-      bpm = 24;
-      pill.textContent = `BPM: ${bpm}`;
-      flatTicksLeft = 5 + Math.floor(Math.random() * 5);
-    }
-  }, 650);
+  sessionStorage.setItem("LLQ_RESULTS", JSON.stringify(payload));
+  window.location.href = `results/result${chosen}.html`;
 }
 
-/* Love Wave */
-function initLoveWave(){
-  const wrap = $("#loveBars");
-  if (!wrap) return;
-  const bars = Array.from(wrap.querySelectorAll(".loveBar"));
-  if (!bars.length) return;
-
-  function tick(){
-    bars.forEach((b, idx) => {
-      const wobble = Math.sin((Date.now()/420) + idx) * 10;
-      const h = 18 + Math.floor(Math.random() * 72) + wobble;
-      b.style.height = Math.max(10, Math.min(96, h)) + "%";
-    });
-  }
-  tick();
-  setInterval(tick, 650);
+function randInt(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  animateTitle();
-  $("#backBtn")?.addEventListener("click", prevQuestion);
-  initBpmAndEkg();
-  initLoveWave();
-  renderQuestion();
-});
+backBtn.addEventListener("click", back);
+animateTitle();
+render();
